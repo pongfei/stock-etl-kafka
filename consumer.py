@@ -71,6 +71,36 @@ for quote in quotes:
 
 print(enriched_records)
 
+#write to a database too
+for record in enriched_records:
+    cursor.execute(
+        """
+        INSERT INTO enriched_stock (
+            ticker,
+            price,
+            volume,
+            change_percent,
+            fetched_at,
+            company,
+            sector,
+            exchange
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """,
+        (
+            record["ticker"],
+            record["price"],
+            record["volume"],
+            record["change_percent"],
+            record["timestamp"],
+            record["company"],
+            record["sector"],
+            record["exchange"],
+        )
+    )
+
+conn.commit()
+
 # write everything to CSV for Tableau to read
 OUTPUT_FILE = "stock_prices_enriched.csv"
 
@@ -82,4 +112,6 @@ with open(OUTPUT_FILE, "w", newline="") as f:
     writer.writerows(enriched_records)
 
 print(f"Done! Wrote {len(enriched_records)} enriched records to {OUTPUT_FILE}")
+
+
 
